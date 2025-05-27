@@ -47,12 +47,12 @@ Además, medimos la capacidad de buffers en los nodos, la demora de transmisión
 ---
 ### Gráficos
 **Ocupación de Buffers en emisores**
-![Buffer Size vs Time](buffer_size_caso2.png)  
+![Buffer Size vs Time](images/buffer_size_caso2.png)  
 En este gráfico, cada línea muestra cuántos paquetes hay en la cola justo después de cada nodo emisor (0,1,2,3,4,6,7). Todas suben de forma parecida hasta llegar al máximo de 200 paquetes. Eso significa que los nodos envían datos más rápido de lo que la cola puede procesar, y por eso se llena.
 
 
 **Delay en el nodo receptor (5)**
-![Delay vs Time en node[5]](delay_caso2.png)  
+![Delay vs Time en node[5]](images/delay_caso2.png)  
 Acá podemos ver cuánto tarda cada paquete en llegar al nodo 5. La línea va subiendo con el tiempo y llega a valores de más de 200 segundos. Eso nos muestra que los paquetes están esperando primero en las colas de los emisores y luego en la del receptor, y por eso el retraso promedio es el doble que en el Caso 1.
 
 ---
