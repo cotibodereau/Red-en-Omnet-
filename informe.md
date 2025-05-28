@@ -47,7 +47,7 @@ Además, medimos la capacidad de buffers en los nodos, la demora de transmisión
 ---
 ### Gráficos
 **Ocupación de Buffers en emisores**
-![Buffer Size vs Time](./images/buffer_size_caso2.png)  
+![Buffer Size vs Time](images/grafico caso 1.svg)  
 En este gráfico, cada línea muestra cuántos paquetes hay en la cola justo después de cada nodo emisor (0,1,2,3,4,6,7). Todas suben de forma parecida hasta llegar al máximo de 200 paquetes. Eso significa que los nodos envían datos más rápido de lo que la cola puede procesar, y por eso se llena.
 
 
