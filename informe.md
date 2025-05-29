@@ -10,6 +10,11 @@
 
 ---
 
+# Introducción
+En este laboratorio trabajaremos con una estructura de red de tipo anillo y realizaremos análisis en distintos casos para ver como se comporta la red, además de, implementar un algoritmo de enrutamiento en la capa de red que redirija el tráfico para evitar congestión y obtener mayor entrega de paquetes.
+
+---
+
 ## Caso 1
 
 ---
