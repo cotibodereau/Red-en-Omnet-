@@ -66,7 +66,7 @@ Una desviación estandar baja, marca una tendencia a un comportamiento más esta
 
 ### Gráficos
 **Ocupación de Buffers en emisores**
-![Buffer Size vs Time](images/buffers1.svg)  
+![Buffer Size vs Time](images/buffers1.png)  
 En este gráfico, podemos ver la ocupacion de los buffers de nuestros nodos 1,2,6,7 y 0, viendo que 0 es el más ocupado por lo explicado anteriormente.
 
 
