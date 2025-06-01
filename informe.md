@@ -17,14 +17,69 @@ En este laboratorio trabajaremos con una estructura de red de tipo anillo y real
 
 ## Caso 1
 
+# Introducción
+En este laboratorio trabajaremos con una estructura de red de tipo anillo y realizaremos análisis en distintos casos para ver como se comporta la red, además de, implementar un algoritmo de enrutamiento en la capa de red que redirija el tráfico para evitar congestión y obtener mayor entrega de paquetes.
+
 ---
-### Métricas
+
+# Análisis de Resultados
+
 ---
+
+## Caso 1
+***Escenario e hipotésis:** En este caso vemos claramente que ni el nodo 3, ni 4 participan de la red, lo cual nos lleva a la hipotésis de que teniendo en cuenta el algoritmo, puede haber cierta congestión ya que los recursos que si se usen la red, asumirirían toda la carga.
+
+---
+### Métricas obtenidas y uso de recursos
+
+En esta primera simulación se configuraron dos fuentes de tráfico: `node[0]` y `node[2]`, ambas transmitiendo hacia `node[5]`. Se evaluaron las métricas recolectadas por los módulos `App` (a través del vector de `Delay`) y `Lnk` (a través del vector de `Buffer Size`).
+
+---
+
+### Métricas recolectadas
+
+Se observaron seis vectores en total:
+
+- 5 vectores de `Buffer Size` correspondientes a los nodos por los que circularon los paquetes (`node[0]`, `node[1]`, `node[2]`, `node[6]`, y `node[7]`).
+- 1 vector de `Delay` en `node[5]`, que recibió los paquetes.
+
+---
+
+Con estas métricas podemos analizar el comportamiento de nuestra red.
+
+### Desviación estandar como Métrica de análisis
+Esta es una medida de dispersión que nos indica cuan alejados están los datos respecto al promedio y nos ayudara a entender mejor como está funcionando la red.
+
+Si tenemos una desviación estandar alta, es decir, alta variabilidad, entonces nos dice que hay paquetes que llegan muy rápido y otros muy tarde.
+
+Una desviación estandar baja, marca una tendencia a un comportamiento más estable, es decir los paquetes no varian mucho su tiempo de llegada. Esto se da en aquellos nodos con baja congestión.
+
+
+---
+### Uso de recursos
+
+- El buffer de `node[0]` presenta una ocupación promedio muy elevada (Mean ≈ 92.9) con una desviación estándar de ≈ 54.88, lo que indica que en ese nodo se genera una alta acumulación de paquetes y también una variabilidad considerable en dicha acumulación, ya que el `node[0]` no solo produce paquetes sino que también recibe los enviados por el `node[2]`, lo cual satura rápidamente el buffer.
+- En cambio, los buffers de `node[1]`, `node[2]`, `node[6]` y `node[7]` muestran valores promedio bajos (≈ 0.5 a 3.3) y desviaciones estándar pequeñas (≈ 0.5 a 2.5), lo cual marca que no están siendo puntos críticos de congestión.
+- En cuanto al retardo (`Delay`) registrado por `node[5]`, el valor promedio es de 51.16 segundos con una desviación estándar de 28.38 segundos. Esta desviación estándar nos marca claramente lo que hablamos antes, que exista una diferencia en los tiempos de llegada de los paquetes. Además, el tiempo promedio es muy alto para la llegada un paquete lo que indica una clara congestión en el tráfico.
+
+---
+
 ### Gráficos
+**Ocupación de Buffers en emisores**
+![Buffer Size vs Time](images/buffers1.svg)  
+En este gráfico, podemos ver la ocupacion de los buffers de nuestros nodos 1,2,6,7 y 0, viendo que 0 es el más ocupado por lo explicado anteriormente.
+
+
+**Delay en el nodo receptor (5)**
+![Delay vs Time en node[5]](images/delay1.png)  
+Acá podemos ver cuánto tarda cada paquete en llegar al nodo 5.
+
 ---
-### Análisis
----
-### Conclusión
+
+### ¿Se puede mejorar?
+
+Sí, podría implementarse algoritmos de ruteo más eficientes para distribuir mejor el tráfico en la red.
+
 ---
 
 ## Caso 2
