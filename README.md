@@ -13,9 +13,6 @@
 # Introducción
 En este laboratorio trabajaremos con una estructura de red de tipo anillo y realizaremos análisis en distintos casos para ver como se comporta la red, además de, implementar un algoritmo de enrutamiento en la capa de red que redirija el tráfico para evitar congestión y obtener mayor entrega de paquetes.
 
----
-
-## Caso 1
 
 ---
 
@@ -181,9 +178,8 @@ packet hPacket extends Packet {
     int direction;
 }
 ```
-Justificación: Los paquetes “Hello” requieren información adicional más
-allá de los paquetes de datos estándar para construir la tabla de enrutamiento
-(lista de nodos visitados y saltos).
+**Justificación**:
+Los paquetes “Hello” requieren información adicional más allá de los paquetes de datos estándar para construir la tabla de enrutamiento (lista de nodos visitados y saltos).
 
 ---
 
@@ -192,7 +188,7 @@ allá de los paquetes de datos estándar para construir la tabla de enrutamiento
 
 Cada nodo debe iniciar el envío de paquetes “Hello” en ambas direcciones al inicio de la simulación.
 
-- **Acción:**  
+**Acción:**  
   En el método `initialize()` del módulo `Net` (`Net.cc`), se crean y envían dos paquetes `hPacket` (uno para cada dirección, `RIGHT_DIR` y `LEFT_DIR`). Estos paquetes se envían a las compuertas `toLnk$o` correspondientes.  
 
 - Código proporcionado que realiza esta acción:
@@ -223,7 +219,90 @@ void Net::initialize()
     send(leftHelloPkt, "toLnk$o", LEFT_DIR);
 }
 ```
-Justificación:
+**Justificación**:
 Al inicio, cada nodo debe anunciar su presencia y comenzar a descubrir la red. En una red circular, enviar en ambas direcciones permite descubrir la topología completa.
 
 ---
+## Paso 3: Manejo de Paquetes “Hello” en el Módulo Net  
+**Commit:** “Manejo-HelloPacket”  
+
+Cuando un módulo Net recibe un paquete “Hello”, debe procesarlo para actualizar su conocimiento de la red. 
+**Acción:** 
+En `Net::handleMessage()` , la sección que comprueba `if pkt->getKind() == 2` (es decir, un Hello packet) se encarga de esto. Se necesita un mecanismo para:
+1. Identificar Si es un paquete “Hello” propio (ya visto) . Si lo es, se procesa la información contenida en el paquete y se elimina el paquete.
+2. Si no es propio, incrementar el contador de saltos (`hopTimes`), añadir la información del nodo actual al paquete (`NodeHop`) y reenviar el paquete en la misma dirección. El código proporcionado ya implementa esta lógica:
+
+```cpp
+// Net::handleMessage() para paquetes Hello
+if (pkt->getKind() == 2) {
+    // Caso 1: el paquete Hello ya llegó a su destino (este nodo)
+    if (pkt->getDestination() == this->getParentModule()->getIndex()) {
+        hPacket *helloPkt = (hPacket *)pkt;
+        // Recorre la lista de saltos que trae el Hello packet
+        for (int i = 0; i < helloPkt->getNodeHopListsArraySize(); i++) {
+            NodeRoute node = {
+                helloPkt->getNodeHopLists(i).currentNode,
+                helloPkt->getNodeHopLists(i).hopCount
+            };
+            routeList.replace(node); 
+            // Actualiza o añade la ruta según el conteo de saltos
+        }
+        delete helloPkt;  // Borra el Hello packet
+        return;
+    }
+
+    // Caso 2: el paquete Hello todavía no llegó a destino, sigue circulando
+    hPacket *helloPkt = (hPacket *)pkt;
+    // Incrementa el contador de saltos
+    helloPkt->setHopTimes(helloPkt->getHopTimes() + 1);
+
+    // Crea un nuevo NodeHop con la info de este nodo
+    NodeHop *node = new NodeHop();
+    node->currentNode = this->getParentModule()->getIndex();
+    node->hopCount    = helloPkt->getHopTimes();
+    node->way         = helloPkt->getDirection();
+
+    // Añade esta entrada al final de la lista de saltos del Hello packet
+    helloPkt->insertNodeHopLists(helloPkt->getNodeHopListsArraySize(), *node);
+    delete node;
+
+    // Reenvía el paquete Hello por la misma dirección
+    send(helloPkt, "toLnk$o", helloPkt->getDirection());
+    return;
+}
+```
+**Justificación**:
+Cada nodo va “aprendiendo” la topología cuando los paquetes “Hello” circulan por el anillo. La estructura routeList en cada nodo (Net.cc) sirve como su tabla de enrutamiento, donde se guardan los nodos alcanzables y la dirección para llegar a ellos con el menor número de saltos.
+---
+## Paso 4: Definición y Uso de `NodeRouteList` y `NodeRoute`  
+**Commit:** “Definicion-routing-table”  
+
+Para almacenar la información de enrutamiento que se va descubriendo con los paquetes “Hello”.
+**Acción:** 
+Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deberían gestionar la routeList y los elementos NodeRoute individualmente. NodeRouteList debería tener un método replace o similar para actualizar las rutas si se encuentra un camino con menos saltos.
+
+ ```cpp
+     struct NodeRoute {
+         int nodeID;    // Índice del nodo destino
+         int hopCount;  // Cantidad de saltos para llegar a ese nodo
+         int way;       // Dirección (0=horario, 1=antihorario) para alcanzar ese nodo
+     };
+```
+     
+- Con esta estructura guardamos, por cada destino, cuántos saltos tomar y en qué sentido.
+
+ ```cpp
+     class NodeRouteList {
+     private:
+         std::vector<NodeRoute> routes;  // Lista de rutas conocidas
+
+     public:
+         void append(NodeRoute node)
+         void replace(NodeRoute newNode);
+         NodeRoute getNodeByID(int id);
+         };
+ ```
+**Justificación**:
+La routeList es fundamental para que cada nodo construya su conocimiento local de la topología y pueda tomar decisiones de enrutamiento informadas. El método replace es clave para el “pseudoDijkstra”.
+---
+
