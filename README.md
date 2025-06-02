@@ -184,7 +184,7 @@ Los paquetes “Hello” requieren información adicional más allá de los paqu
 ---
 
 ### Paso 2: Inicialización y Envío de Paquetes “Hello” en el Módulo Net  
-**Commit:** “Implement Hello packet sending at Net initialization”
+**Commit:** “Hello-Packet-initialization”
 
 Cada nodo debe iniciar el envío de paquetes “Hello” en ambas direcciones al inicio de la simulación.
 
@@ -227,9 +227,10 @@ Al inicio, cada nodo debe anunciar su presencia y comenzar a descubrir la red. E
 **Commit:** “Manejo-HelloPacket”  
 
 Cuando un módulo Net recibe un paquete “Hello”, debe procesarlo para actualizar su conocimiento de la red. 
+
 **Acción:** 
-En `Net::handleMessage()` , la sección que comprueba `if pkt->getKind() == 2` (es decir, un Hello packet) se encarga de esto. Se necesita un mecanismo para:
-1. Identificar Si es un paquete “Hello” propio (ya visto) . Si lo es, se procesa la información contenida en el paquete y se elimina el paquete.
+En `Net::handleMessage()`, la sección que comprueba `if pkt->getKind() == 2` (es decir, un Hello packet) se encarga de esto. Se necesita un mecanismo para:
+1. Identificar Si es un paquete “Hello” propio (ya visto). Si lo es, se procesa la información contenida en el paquete y se elimina el paquete.  
 2. Si no es propio, incrementar el contador de saltos (`hopTimes`), añadir la información del nodo actual al paquete (`NodeHop`) y reenviar el paquete en la misma dirección. El código proporcionado ya implementa esta lógica:
 
 ```cpp
@@ -278,10 +279,11 @@ Cada nodo va “aprendiendo” la topología cuando los paquetes “Hello” cir
 **Commit:** “Definicion-routing-table”  
 
 Para almacenar la información de enrutamiento que se va descubriendo con los paquetes “Hello”.
+
 **Acción:** 
 Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deberían gestionar la routeList y los elementos NodeRoute individualmente. NodeRouteList debería tener un método replace o similar para actualizar las rutas si se encuentra un camino con menos saltos.
 
- ```cpp
+```cpp
      struct NodeRoute {
          int nodeID;    // Índice del nodo destino
          int hopCount;  // Cantidad de saltos para llegar a ese nodo
