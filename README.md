@@ -186,3 +186,44 @@ allá de los paquetes de datos estándar para construir la tabla de enrutamiento
 (lista de nodos visitados y saltos).
 
 ---
+
+### Paso 2: Inicialización y Envío de Paquetes “Hello” en el Módulo Net  
+**Commit:** “Implement Hello packet sending at Net initialization”
+
+Cada nodo debe iniciar el envío de paquetes “Hello” en ambas direcciones al inicio de la simulación.
+
+- **Acción:**  
+  En el método `initialize()` del módulo `Net` (`Net.cc`), se crean y envían dos paquetes `hPacket` (uno para cada dirección, `RIGHT_DIR` y `LEFT_DIR`). Estos paquetes se envían a las compuertas `toLnk$o` correspondientes.  
+
+- Código proporcionado que realiza esta acción:
+
+```cpp
+// Net::initialize()
+void Net::initialize()
+{
+    NodeRoute node = {this->getParentModule()->getIndex(), 0, RIGHT_DIR};
+    routeList.append(node); // Assuming routeList is for the node itself initially
+
+    hPacket *rightHelloPkt = new hPacket();
+    rightHelloPkt->setByteLength(par("packetByteSize"));
+    rightHelloPkt->setSource(this->getParentModule()->getIndex());
+    rightHelloPkt->setDestination(this->getParentModule()->getIndex());
+    rightHelloPkt->setHopTimes(0);
+    rightHelloPkt->setKind(2); // Kind 2 for Hello packets
+    rightHelloPkt->setDirection(RIGHT_DIR);
+    send(rightHelloPkt, "toLnk$o", RIGHT_DIR);
+
+    hPacket *leftHelloPkt = new hPacket();
+    leftHelloPkt->setByteLength(par("packetByteSize"));
+    leftHelloPkt->setSource(this->getParentModule()->getIndex());
+    leftHelloPkt->setDestination(this->getParentModule()->getIndex());
+    leftHelloPkt->setDirection(LEFT_DIR);
+    leftHelloPkt->setHopTimes(0);
+    leftHelloPkt->setKind(2); // Kind 2 for Hello packets
+    send(leftHelloPkt, "toLnk$o", LEFT_DIR);
+}
+```
+Justificación:
+Al inicio, cada nodo debe anunciar su presencia y comenzar a descubrir la red. En una red circular, enviar en ambas direcciones permite descubrir la topología completa.
+
+---
