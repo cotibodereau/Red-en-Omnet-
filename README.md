@@ -140,3 +140,49 @@ Cuando el tráfico alcanza aproximadamente 3 paquetes por segundo (`InterArrival
 Cuando usamos rutas estáticas y enviamos muchos paquetes muy seguido (`exponential(1)`), la red se satura rápidamente y el retraso aumenta considerablemente.
 
 Si ajustamos el tiempo entre envíos (`exponential(7)`) y utilizamos un algoritmo que elige mejores rutas, logramos que la red funcione de forma más estable y rápida.
+
+---
+## Diseño de algoritmo de enrutamiento
+
+---
+## Objetivo:
+Diseñar un algoritmo de enrutamiento en OMNET para una red de topología anillo de 8 nodos que supere al propuesto por la cátedra.
+
+---
+## Diseño del algoritmo:
+Utilizaremos paquetes "Hello" para descubrir la topología de la red y determinar el camino más corto al destino de los paquetes y así controlar la congestión, utilizando lógica del algoritmo de Dijkstra.
+
+---
+## Implementación Progresiva del Envío de Paquetes “Hello” y Descubrimiento de Topología
+
+---
+### Paso 1: Definición de mensajes `hPacket` para Hello
+
+**Commit:** `Define hPacket for Hello messages`
+
+Se definió un nuevo tipo de mensaje `hPacket` en el archivo `packet.msg` para el descubrimiento de la topología.
+
+```cpp
+packet Packet {
+    int source;
+    int destination;
+    int kind; // 0: data, 2: hello
+}
+
+class NodeHop {
+    int currentNode;
+    int hopCount;
+    int way; // 0: RIGHT_DIR, 1: LEFT_DIR
+}
+
+packet hPacket extends Packet {
+    NodeHop nodeHopLists[];
+    int hopTimes;
+    int direction;
+}
+```
+Justificación: Los paquetes “Hello” requieren información adicional más
+allá de los paquetes de datos estándar para construir la tabla de enrutamiento
+(lista de nodos visitados y saltos).
+
+---
