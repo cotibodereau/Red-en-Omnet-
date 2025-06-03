@@ -310,10 +310,11 @@ Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deb
 La routeList es fundamental para que cada nodo construya su conocimiento local de la topología y pueda tomar decisiones de enrutamiento informadas. El método replace es clave para el “pseudoDijkstra”.
 ---
 
-#### Paso 5: Enrutamiento de Paquetes de Datos en el Módulo `Net` 
+## Paso 5: Enrutamiento de Paquetes de Datos en el Módulo `Net` 
 Una vez que los paquetes "Hello" han establecido las tablas de enrutamiento, los paquetes de datos pueden ser reenviados hacia su destino.
 
-* **Acción:** En `Net::handleMessage()`, la sección `else if (pkt->getKind() == 0)` se encarga del manejo de paquetes de datos. El código proporcionado ya realiza esta acción:
+**Acción:** 
+En `Net::handleMessage()`, la sección `else if (pkt->getKind() == 0)` se encarga del manejo de paquetes de datos. El código proporcionado ya realiza esta acción:
 
     ```cpp
     // Net::handleMessage() for data packets
@@ -334,9 +335,10 @@ Una vez que los paquetes "Hello" han establecido las tablas de enrutamiento, los
     }
     ```
 
-**Justificación:** Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
+**Justificación**:
+Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
 ---
-### Dijkstra para el Camino Más Corto
+## Dijkstra para el Camino Más Corto
 
 El algoritmo implementado para el descubrimiento del camino más corto es una forma simplificada del camino mas corto", más bien, es un protocolo de enrutamiento basado en vector de distancia (o de estado de enlace muy rudimentario).
 
