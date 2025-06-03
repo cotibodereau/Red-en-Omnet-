@@ -309,6 +309,33 @@ Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deb
 **Justificación**:
 La routeList es fundamental para que cada nodo construya su conocimiento local de la topología y pueda tomar decisiones de enrutamiento informadas. El método replace es clave para el “pseudoDijkstra”.
 ---
+
+#### Paso 5: Enrutamiento de Paquetes de Datos en el Módulo `Net` 
+Una vez que los paquetes "Hello" han establecido las tablas de enrutamiento, los paquetes de datos pueden ser reenviados hacia su destino.
+
+* **Acción:** En `Net::handleMessage()`, la sección `else if (pkt->getKind() == 0)` se encarga del manejo de paquetes de datos. El código proporcionado ya realiza esta acción:
+
+    ```cpp
+    // Net::handleMessage() for data packets
+    else if (pkt->getKind() == 0)
+    {
+        if (pkt->getDestination() == this->getParentModule()->getIndex())
+        {
+            send(msg, "toApp$o"); // Packet reached its destination
+        }
+        else
+        {
+            int direction;
+            NodeRoute node;
+            node = routeList.getNodeByID(pkt->getDestination());
+            direction = node.way; // Get the direction from the routing table
+            send(msg, "toLnk$o", direction); // Forward the packet
+        }
+    }
+    ```
+
+* **Justificación:** Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
+---
 ## Comparación de Resultados: Caso 2
 En el Caso 2, ahora todos los nodos menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
 
