@@ -307,4 +307,39 @@ Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deb
 **Justificación**:
 La routeList es fundamental para que cada nodo construya su conocimiento local de la topología y pueda tomar decisiones de enrutamiento informadas. El método replace es clave para el “pseudoDijkstra”.
 ---
+## Comparación de Resultados: Caso 2
+En el **Caso 2**, ahora **todos los nodos** menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
+
+### ¿Qué pasa con el algoritmo original?
+
+Como antes, el algoritmo original manda todo el tráfico por la misma salida (siempre sentido horario). Esto hace que **todos los paquetes de todos los nodos se acumulen en los mismos enlaces y buffers**, lo que genera un embudo y puede saturar la red.
+
+- Hay más cola en los buffers.
+- Aparece más demora para entregar los paquetes.
+- Incluso puede haber pérdidas si los buffers se llenan.
+
+### ¿Y nuestro algoritmo nuevo?
+
+Ahora sí, **acá se nota la diferencia**. Nuestro algoritmo, al conocer los caminos gracias a los mensajes HELLO, puede elegir el camino más corto para cada paquete. Esto hace que:
+
+- Algunos nodos manden por un lado, otros por el otro (usando ambos sentidos del anillo).
+- El tráfico se reparte mejor, no se genera tanto embudo.
+- La demora y el uso de buffers bajan, porque la carga está más distribuida.
+- Todo funciona de forma más eficiente.
+
+### ¿Qué muestran los resultados?
+
+Cuando miramos los gráficos y las métricas, se nota que con nuestro algoritmo:
+
+- La **demora promedio** de los paquetes es menor.
+- Los **buffers** no se llenan tanto.
+- La cantidad de **saltos** puede ser menor o igual, pero ahora el tráfico está mucho más balanceado.
+A continuación se muestran dos gráficos que lo evidencian:
+![Gráfico buffers caso 2](images/bufferC2Disenio.svg)  
+![Gráfico delay caso 2](images/delayC2disenio.svg)  
+
+**Conclusión general:**  
+El algoritmo mejorado se nota en serio cuando la red tiene mucho tráfico, porque reparte mejor la carga y hace que todo funcione más rápido y con menos congestión. En situaciones simples como el Caso 1, no hay diferencia, pero cuando la red se pone exigente, la mejora es clara.
+
+---
 
