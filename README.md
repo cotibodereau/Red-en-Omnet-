@@ -376,6 +376,37 @@ El control de congestión no está explícitamente implementado en el código pr
     Actualmente, el control de congestión es pasivo, solo se puede observar a través de las estadísticas del buffer.
 
 ---
+
+## Comparación de Resultados: Caso 1
+
+En el Caso 1, solo los nodos 0 y 2 le mandan paquetes al nodo 5 en la red en anillo de 8 nodos.
+
+### ¿Qué hace el algoritmo original?
+
+El algoritmo original (el "kickstarter") siempre manda los paquetes por la misma salida, siguiendo el sentido horario del anillo. Entonces, por ejemplo:
+
+- Del nodo 0 al 5: pasa por 1, 2, 3, 4 y llega a 5 (5 saltos).
+- Del nodo 2 al 5: pasa por 3, 4 y llega a 5 (3 saltos).
+
+### ¿Y nuestro algoritmo?
+
+Nuestro algoritmo nuevo usa mensajes "HELLO" para aprender por dónde llega a cada vecino, y después elige siempre la ruta más corta hasta el destino.
+
+Pero en este caso, el camino más corto sigue siendo el mismo que el del algoritmo original, porque:
+
+- No hay congestión.
+- El tráfico es bajo.
+- La mejor opción sigue siendo ir en sentido horario.
+
+### ¿Qué pasó con los resultados?
+
+Cuando corrimos las simulaciones, los resultados nos dieron iguales: la demora, el uso de buffers y la cantidad de saltos no cambiaron entre el algoritmo original y el nuestro.
+
+ *Resumen:*  
+En el Caso 1, aunque el algoritmo sea más inteligente, no se nota la diferencia porque la red está tranquila y el camino más corto es igual al de siempre. La verdadera mejora aparece cuando hay más tráfico y más competencia por los caminos, como vamos a ver en el Caso 2.
+
+---
+
 ## Comparación de Resultados: Caso 2
 En el Caso 2, ahora todos los nodos menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
 
@@ -407,6 +438,8 @@ A continuación se muestran dos gráficos que lo evidencian:
 ![Gráfico buffers caso 2](images/bufferC2Disenio.svg)  
 ![Gráfico delay caso 2](images/delayC2disenio.svg)  
 
+
+---
 **Conclusión general:**  
 El algoritmo mejorado se nota en serio cuando la red tiene mucho tráfico, porque reparte mejor la carga y hace que todo funcione más rápido y con menos congestión. En situaciones simples como el Caso 1, no hay diferencia, pero cuando la red se pone exigente, la mejora es clara.
 
