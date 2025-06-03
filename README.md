@@ -21,7 +21,7 @@ En este laboratorio trabajaremos con una estructura de red de tipo anillo y real
 ---
 
 ## Caso 1
-***Escenario e hipotésis:** En este caso vemos claramente que ni el nodo 3, ni 4 participan de la red, lo cual nos lleva a la hipotésis de que teniendo en cuenta el algoritmo, puede haber cierta congestión ya que los recursos que si se usen la red, asumirirían toda la carga.
+**Escenario e hipotésis:** En este caso vemos claramente que ni el nodo 3, ni 4 participan de la red, lo cual nos lleva a la hipotésis de que teniendo en cuenta el algoritmo, puede haber cierta congestión ya que los recursos que si se usen la red, asumirirían toda la carga.
 
 ---
 ### Métricas obtenidas y uso de recursos
@@ -230,8 +230,10 @@ Cuando un módulo Net recibe un paquete “Hello”, debe procesarlo para actual
 
 **Acción:** 
 En `Net::handleMessage()`, la sección que comprueba `if pkt->getKind() == 2` (es decir, un Hello packet) se encarga de esto. Se necesita un mecanismo para:
-1. Identificar Si es un paquete “Hello” propio (ya visto). Si lo es, se procesa la información contenida en el paquete y se elimina el paquete.  
+
+1. Identificar si es un paquete “Hello” propio (ya visto). Si lo es, se procesa la información contenida en el paquete y se elimina el paquete.  
 2. Si no es propio, incrementar el contador de saltos (`hopTimes`), añadir la información del nodo actual al paquete (`NodeHop`) y reenviar el paquete en la misma dirección. El código proporcionado ya implementa esta lógica:
+
 
 ```cpp
 // Net::handleMessage() para paquetes Hello
@@ -308,11 +310,11 @@ Se asume la existencia de `node_route_list.h` y `node_route.h`. Estas clases deb
 La routeList es fundamental para que cada nodo construya su conocimiento local de la topología y pueda tomar decisiones de enrutamiento informadas. El método replace es clave para el “pseudoDijkstra”.
 ---
 ## Comparación de Resultados: Caso 2
-En el **Caso 2**, ahora **todos los nodos** menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
+En el Caso 2, ahora todos los nodos menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
 
 ### ¿Qué pasa con el algoritmo original?
 
-Como antes, el algoritmo original manda todo el tráfico por la misma salida (siempre sentido horario). Esto hace que **todos los paquetes de todos los nodos se acumulen en los mismos enlaces y buffers**, lo que genera un embudo y puede saturar la red.
+Como antes, el algoritmo original manda todo el tráfico por la misma salida (siempre sentido horario). Esto hace que todos los paquetes de todos los nodos se acumulen en los mismos enlaces y buffers, lo que genera un embudo y puede saturar la red.
 
 - Hay más cola en los buffers.
 - Aparece más demora para entregar los paquetes.
@@ -320,7 +322,7 @@ Como antes, el algoritmo original manda todo el tráfico por la misma salida (si
 
 ### ¿Y nuestro algoritmo nuevo?
 
-Ahora sí, **acá se nota la diferencia**. Nuestro algoritmo, al conocer los caminos gracias a los mensajes HELLO, puede elegir el camino más corto para cada paquete. Esto hace que:
+Ahora sí, acá se nota la diferencia. Nuestro algoritmo, al conocer los caminos gracias a los mensajes HELLO, puede elegir el camino más corto para cada paquete. Esto hace que:
 
 - Algunos nodos manden por un lado, otros por el otro (usando ambos sentidos del anillo).
 - El tráfico se reparte mejor, no se genera tanto embudo.
@@ -331,9 +333,9 @@ Ahora sí, **acá se nota la diferencia**. Nuestro algoritmo, al conocer los cam
 
 Cuando miramos los gráficos y las métricas, se nota que con nuestro algoritmo:
 
-- La **demora promedio** de los paquetes es menor.
-- Los **buffers** no se llenan tanto.
-- La cantidad de **saltos** puede ser menor o igual, pero ahora el tráfico está mucho más balanceado.
+- La demora promedio de los paquetes es menor.
+- Los buffers no se llenan tanto.
+- La cantidad de saltos puede ser menor o igual, pero ahora el tráfico está mucho más balanceado.
 A continuación se muestran dos gráficos que lo evidencian:
 ![Gráfico buffers caso 2](images/bufferC2Disenio.svg)  
 ![Gráfico delay caso 2](images/delayC2disenio.svg)  
