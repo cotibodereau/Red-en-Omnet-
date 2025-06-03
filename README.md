@@ -336,6 +336,44 @@ Una vez que los paquetes "Hello" han establecido las tablas de enrutamiento, los
 
 * **Justificación:** Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
 ---
+### Dijkstra para el Camino Más Corto
+
+El algoritmo implementado para el descubrimiento del camino más corto es una forma simplificada del camino mas corto", más bien, es un protocolo de enrutamiento basado en vector de distancia (o de estado de enlace muy rudimentario).
+
+* **Cómo funciona:**
+    1.  Cada nodo genera paquetes "Hello" en ambas direcciones con un contador de saltos (`hopTimes`) inicializado en 0 y una lista vacía de nodos visitados (`NodeHopLists`).
+    2.  Cuando un nodo intermedio recibe un paquete "Hello":
+        * Incrementa el `hopTimes`.
+        * Añade su propio ID y el `hopTimes` actual a la lista `NodeHopLists` del paquete.
+        * Reenvía el paquete en la misma dirección.
+    3.  Cuando un paquete "Hello" regresa a su nodo de origen (el `destination` del paquete es el `index` del nodo actual):
+        * El nodo de origen examina la lista `NodeHopLists` dentro del paquete.
+        * Para cada nodo en esa lista, el nodo de origen actualiza su `routeList` local. Si ya tiene una entrada para ese nodo, compara el `hopCount` registrado con el `hopCount` del paquete "Hello" para ese nodo. Si el `hopCount` del paquete "Hello" es menor, reemplaza la entrada existente en `routeList` con la nueva información de ruta y dirección.
+
+* **Ventajas de esta aproximación:** Permite que cada nodo construya una tabla de enrutamiento que mapea los nodos destino a la dirección (izquierda o derecha) que proporciona el camino más corto (en términos de saltos) a ese destino.
+
+* **Limitaciones:** No es un Dijkstra completo porque no considera métricas de costo más allá de los saltos (como el retardo del enlace o el ancho de banda). Tampoco es un algoritmo iterativo de inundación y construcción de árboles de caminos más cortos como Dijkstra tradicional, sino que cada paquete "Hello" construye una ruta mientras viaja, y el receptor actualiza su tabla con la mejor información vista.
+
+### Control de Congestión en una Red Simulada
+
+El control de congestión no está explícitamente implementado en el código proporcionado a nivel de `Net` o `App`. Sin embargo, el módulo `Lnk` (Link) tiene una cola (`buffer`) y un mecanismo de servicio que puede ser utilizado para observar y potencialmente controlar la congestión.
+
+* **Observación de Congestión:**
+    * El módulo `Lnk` registra el tamaño de la cola (`bufferSizeVector`). Esta métrica es crucial para observar la congestión. Un aumento constante en el tamaño de la cola o un tamaño de cola consistentemente alto indican congestión en el enlace.
+    * `Lnk` también tiene un `endServiceEvent` y un `serviceTime` (`pkt->getDuration()`). Si el `serviceTime` se basa en el tamaño del paquete y la tasa de datos del enlace, un aumento en los tiempos de servicio o la duración de los paquetes en la cola también indicaría congestión.
+
+
+* **Cómo se puede implementar el control de congestión (futuras mejoras):**
+    1.  **Mecanismos de Descarte de Paquetes:** Si la cola del `Lnk` supera un umbral, se podrían descartar paquetes. Esto es una forma de control de congestión proactiva o reactiva simple.
+    2.  **Mecanismos de Reducción de Tasa en la Aplicación:** El módulo `App` podría ser notificado sobre la congestión (por ejemplo, por el módulo `Net` o `Lnk` si se propaga la información) y reducir su `interArrivalTime` (o aumentar el tiempo entre envíos de paquetes) para disminuir la tasa de inyección de paquetes. Esto se puede lograr con un mensaje de retroalimentación de la capa de enlace o red a la capa de aplicación.
+    3.  **Algoritmos de Control de Congestión:** Para una implementación más avanzada, se podrían integrar algoritmos como:
+        * **Control de Flujo Basado en Créditos/Ventanas:** Donde el remitente solo envía un número limitado de paquetes hasta que recibe una confirmación del receptor o un indicativo de que hay espacio en la cola.
+        * **Algoritmos de Control de Congestión TCP-like:** Como Slow Start, Congestion Avoidance, Fast Retransmit, etc., que ajustan la tasa de envío dinámicamente en función de la pérdida de paquetes o los retrasos.
+        * **ECN (Explicit Congestion Notification):** Donde los nodos intermedios marcan los paquetes para indicar congestión en lugar de descartarlos, permitiendo que los puntos finales ajusten su comportamiento.
+
+    Actualmente, el control de congestión es pasivo, solo se puede observar a través de las estadísticas del buffer.
+
+---
 ## Comparación de Resultados: Caso 2
 En el Caso 2, ahora todos los nodos menos el 5 (o sea, 0, 1, 2, 3, 4, 6 y 7) están mandando paquetes al nodo 5, todos al mismo tiempo y con la misma frecuencia y tamaño de paquetes.
 
