@@ -334,7 +334,7 @@ Una vez que los paquetes "Hello" han establecido las tablas de enrutamiento, los
     }
     ```
 
-* **Justificación:** Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
+**Justificación:** Los paquetes de datos son enviados a la dirección que la `routeList` indica como la que tiene el menor número de saltos para alcanzar el destino.
 ---
 ### Dijkstra para el Camino Más Corto
 
