@@ -9,6 +9,19 @@
 * Fonseca Gonzalo Agustín
 
 ---
+## Tabla de Contenidos
+
+1. [Introducción](#introducción)
+2. [Análisis de Resultados](#análisis-de-resultados)
+   - [Caso 1](#caso-1)
+   - [Caso 2](#caso-2)
+3. [Diseño del Algoritmo de Enrutamiento](#diseño-de-algoritmo-de-enrutamiento)
+4. [Dijkstra y Descubrimiento de Topología](#dijkstra-para-el-camino-más-corto)
+5. [Control de Congestión](#control-de-congestión-en-una-red-simulada)
+6. [Comparación de Resultados](#comparación-de-resultados)
+7. [Conclusión General](#conclusión-general)
+   
+---
 
 # Introducción
 En este laboratorio trabajaremos con una estructura de red de tipo anillo y realizaremos análisis en distintos casos para ver como se comporta la red, además de, implementar un algoritmo de enrutamiento en la capa de red que redirija el tráfico para evitar congestión y obtener mayor entrega de paquetes.
